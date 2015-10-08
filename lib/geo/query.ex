@@ -60,7 +60,7 @@ defmodule Geo.Query do
   end
 
   @doc """
-  Estimates the distance between two `Geo.Geometry.Point` `a` and `b`
+  Estimates the distance in meters between two `Geo.Geometry.Point` `a` and `b`
   using the [Law of
   Harvestines](http://en.wikipedia.org/wiki/Law_of_haversines)
 
