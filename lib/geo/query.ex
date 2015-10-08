@@ -61,8 +61,7 @@ defmodule Geo.Query do
 
   @doc """
   Estimates the distance in meters between two `Geo.Geometry.Point` `a` and `b`
-  using the [Law of
-  Harvestines](http://en.wikipedia.org/wiki/Law_of_haversines)
+  using the [Law of Harvestines](http://en.wikipedia.org/wiki/Law_of_haversines)
 
   Provides a better estimate of distance than the Euclidean distance
   for the R-Tree.
