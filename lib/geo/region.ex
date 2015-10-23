@@ -16,7 +16,6 @@ defmodule Geo.Region do
       :ok
       iex> {:ok, points} = Geo.Region.query_around(region, point_c, 500)
       {:ok, [...]}
-
   """
   @region_sup Geo.Region.Supervisor
 

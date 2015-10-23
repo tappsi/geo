@@ -24,7 +24,7 @@ defmodule Geo do
   `Geo.Geometry` offers different shapes we can use for doing queries
   against different coordinates.
 
-  Let's see an example:
+  ### Example
 
       iex> a = Geo.Geometry.Point.new(47.123, 120.567)
       {:geometry, ...}

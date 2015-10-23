@@ -26,9 +26,6 @@ defmodule Geo.Geometry do
   By using [R-Trees](https://en.wikipedia.org/wiki/R-tree) for storing
   the geolocation points we ensure that our table will increase its
   size to minimum.
-
-  > NOTE: The current implementation for the `rstar` library is
-  written with Erlang records, lists and the Erlang `:dict` module.
   """
 end
 
@@ -157,6 +154,7 @@ defmodule Geo.Geometry.SearchBox do
     lng_spread = distance_pad / Query.longitudinal_width(widest_lat)
     min_lng = lng - lng_spread
     max_lng = lng + lng_spread
+
     coords  = [{min_lat, max_lat}, {min_lng, max_lng}]
 
     Point.geometry(dimensions: 2, mbr: coords, value: value)
