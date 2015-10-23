@@ -4,10 +4,10 @@ defmodule Geo.Geometry do
 
   We use an [R-Tree](https://en.wikipedia.org/wiki/R-tree) to
   represent the surface of the Earth in a 2D plane. It is an excellent
-  way to encode multi-dimentional information and allows for efficient
+  way to encode multi-dimensional information and allows for efficient
   query capabilities.
 
-  It is the same structure also used to represent the geographical
+  It is the same structure used to represent the geographical
   search points in the `Geo.Query` module to implement its API.
 
   ## Points
@@ -39,19 +39,19 @@ defmodule Geo.Geometry.Point do
                                              from_lib: "rstar/include/rstar.hrl")
 
   @doc """
-  Return a new 2D point from `lat` and `lon`
+  Returns new 2D point from `lat` and `lon`
   """
   def new(lat, lon, value \\ :undefined) when is_number(lat) and is_number(lon) do
     :rstar_geometry.point2d(lat, lon, value)
   end
 
-  @doc "Return the latitude for `arg`"
+  @doc "Returns the latitude for `arg`"
   def latitude({:geometry, 2, [{lat, _}, {_, _}], _}), do: lat
 
-  @doc "Return the longitude for `arg`"
+  @doc "Returns the longitude for `arg`"
   def longitude({:geometry, 2, [{_, _}, {lng, _}], _}), do: lng
 
-  @doc "Return the latitude and longitude for `arg`"
+  @doc "Returns the latitude and longitude for `arg`"
   def latlon({:geometry, 2, [{lat, _}, {lng, _}], _}) do
     {lat, lng}
   end
@@ -62,7 +62,7 @@ defmodule Geo.Geometry.Zone do
   Zone wrapper
   """
 
-  @doc "Return a new zone with the given `dimensions`"
+  @doc "Returns a new zone with the given `dimensions`"
   def new(dimensions) when dimensions < 1 do
     raise "invalid dimension"
   end
@@ -70,12 +70,12 @@ defmodule Geo.Geometry.Zone do
     :rstar.new(dimensions)
   end
 
-  @doc "Add a `point` to the `zone`"
+  @doc "Adds a `point` to the `zone`"
   def add_point(zone, point) do
     :rstar.insert(zone, point)
   end
 
-  @doc "Delete a `point` from the `zone`"
+  @doc "Deletes a `point` from the `zone`"
   def delete_point(zone, point) do
     :rstar.delete(zone, point)
   end
@@ -160,22 +160,22 @@ defmodule Geo.Geometry.SearchBox do
     Point.geometry(dimensions: 2, mbr: coords, value: value)
   end
 
-  @doc "Return the area of the given `search_box`"
+  @doc "Returns the area of the given `search_box`"
   def area(search_box) do
     :rstar_geometry.area(search_box)
   end
 
-  @doc "Return the margin of the given `search_box`"
+  @doc "Returns the margin of the given `search_box`"
   def margin(search_box) do
     :rstar_geometry.margin(search_box)
   end
 
-  @doc "Return the overlapping search box from `a` and `b`"
+  @doc "Returns the overlapping search box from `a` and `b`"
   def intersect(a, b) do
     :rstar_geometry.intersect(a, b)
   end
 
-  @doc "Return the center of the given `search_box`"
+  @doc "Returns the center of the given `search_box`"
   def center(search_box) do
     :rstar_geometry.center(search_box)
   end
