@@ -36,7 +36,7 @@ defmodule Geo.Mixfile do
     [{:rstar, github: "armon/erl-rstar"},
 
      # Documentation
-     {:ex_doc, "~> 0.10", only: :docs},
+     {:ex_doc, "~> 0.11", only: :docs},
      {:earmark, "~> 0.1", only: :docs}]
   end
 end
