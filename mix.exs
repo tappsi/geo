@@ -34,7 +34,6 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [{:rstar, github: "armon/erl-rstar"},
-     {:benchfella, github: "alco/benchfella", only: :bench},
 
      # Documentation
      {:ex_doc, "~> 0.10", only: :docs},
