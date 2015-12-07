@@ -18,7 +18,10 @@ defmodule Geo.Region.Server do
   end
 
   def init([id, name, lat, lon]) do
-    table_opts = [read_concurrency: true, write_concurrency: true]
+    table_opts =
+      [:set,
+       read_concurrency: true,
+       write_concurrency: true]
 
     object_table = :ets.new(:objects, table_opts)
     geo_table = :ets.new(:geometries, table_opts)
