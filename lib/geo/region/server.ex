@@ -21,10 +21,10 @@ defmodule Geo.Region.Server do
     table_opts = [read_concurrency: true, write_concurrency: true]
 
     object_table = :ets.new(:objects, table_opts)
-    geo_table    = :ets.new(:geometries, table_opts)
+    geo_table = :ets.new(:geometries, table_opts)
 
     coverage = Point.new(lat, lon) |> SearchBox.new(@default_radius)
-    zone     = Zone.new(2)
+    zone = Zone.new(2)
 
     state =
       %{id: id, name: name, objects: object_table,
@@ -36,9 +36,10 @@ defmodule Geo.Region.Server do
   ## Objects API
 
   def handle_call(:list_objects, _from, state) do
-    keys = :ets.foldl(fn {key, _val}, acc ->
-      [key | acc]
-    end, [], state.objects)
+    keys =
+      :ets.foldl(fn {key, _val}, acc ->
+        [key | acc]
+      end, [], state.objects)
 
     {:reply, {:ok, keys}, state}
   end

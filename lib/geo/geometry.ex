@@ -149,13 +149,13 @@ defmodule Geo.Geometry.SearchBox do
       cond do
         lat >= 0 -> max_lat
         lat < 0  -> min_lat
-    end
+      end
 
     lng_spread = distance_pad / Query.longitudinal_width(widest_lat)
     min_lng = lng - lng_spread
     max_lng = lng + lng_spread
 
-    coords  = [{min_lat, max_lat}, {min_lng, max_lng}]
+    coords = [{min_lat, max_lat}, {min_lng, max_lng}]
 
     Point.geometry(dimensions: 2, mbr: coords, value: value)
   end
