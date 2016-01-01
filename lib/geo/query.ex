@@ -43,7 +43,7 @@ defmodule Geo.Query do
     search_box = SearchBox.new(point, distance)
 
     Zone.search_within(zone, search_box)
-    |> Enum.filter &(distance(point, &1) <= distance)
+    |> Enum.filter(&(distance(point, &1) <= distance))
   end
 
   @doc """
@@ -56,7 +56,7 @@ defmodule Geo.Query do
     Zone.search_nearest(zone, point, 2 * k)
     |> Enum.map(&({distance(point, &1), &1}))
     |> Enum.sort_by(&near/1, &<=/2)
-    |> Enum.take k
+    |> Enum.take(k)
   end
 
   @doc """

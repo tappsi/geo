@@ -49,9 +49,9 @@ defmodule Geo.Region do
   @doc "Return all the available regions"
   def all do
     Supervisor.which_children(@region_sup)
-    |> Enum.map fn {name, pid, _, _} ->
+    |> Enum.map(fn {name, pid, _, _} ->
       {name, pid}
-    end
+    end)
   end
 
   @doc "Create a new region"
