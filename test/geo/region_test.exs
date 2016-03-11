@@ -15,9 +15,9 @@ defmodule Geo.RegionTest do
   setup do
     on_exit fn ->
       Region.all
-      |> Enum.each fn {region, _pid} ->
+      |> Enum.each(fn {region, _pid} ->
         Region.shutdown(region)
-      end
+      end)
     end
 
     {:ok, region} = Region.new("Bogotá", 4.598056, -74.075833)
