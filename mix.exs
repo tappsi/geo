@@ -12,6 +12,7 @@ defmodule Geo.Mixfile do
      description: description,
      docs: docs,
      elixir: "~> 1.2",
+     test_coverage: [tool: ExCoveralls],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -34,6 +35,8 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [{:rstar, github: "armon/erl-rstar"},
+
+     {:excoveralls, "~> 0.4", only: :test},
 
      # Documentation
      {:ex_doc, "~> 0.11", only: :docs},
