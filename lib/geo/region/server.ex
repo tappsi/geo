@@ -1,5 +1,6 @@
 defmodule Geo.Region.Server do
   @moduledoc false
+
   use GenServer
 
   alias Geo.Query

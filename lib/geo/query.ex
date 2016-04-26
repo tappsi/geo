@@ -112,7 +112,7 @@ defmodule Geo.Query do
 
   Earth is modelled as an ellipsoid. We use a
   [WGS84](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84)
-  ellipsoid with `a = #{inspect @radius_meters}` and have e² as extra
+  ellipsoid with `a = #{@radius_meters}` and have e² as extra
   parameter.
   """
   def longitudinal_width(lat) when is_number(lat) do

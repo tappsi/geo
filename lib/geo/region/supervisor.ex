@@ -1,5 +1,6 @@
 defmodule Geo.Region.Supervisor do
   @moduledoc false
+
   use Supervisor
 
   # API
