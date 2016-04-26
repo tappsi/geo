@@ -36,7 +36,7 @@ defmodule Geo.Mixfile do
   defp deps do
     [{:rstar, github: "armon/erl-rstar"},
 
-     {:excoveralls, "~> 0.4", only: :test},
+     {:excoveralls, "~> 0.5", only: :test},
 
      # Documentation
      {:ex_doc, "~> 0.11", only: :docs},
