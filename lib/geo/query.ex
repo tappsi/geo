@@ -18,10 +18,8 @@ defmodule Geo.Query do
 
     * `0.00669437999014` as [e²](https://en.wikipedia.org/wiki/Eccentricity_%28mathematics%29)
   """
-  alias Geo.Geometry.Point
-  alias Geo.Geometry.Zone
-  alias Geo.Geometry.SearchBox
 
+  alias Geo.Geometry.{Point, Zone, SearchBox}
   alias :math, as: Math
 
   @radius_meters 6378137.0              # Earth's radius in meters

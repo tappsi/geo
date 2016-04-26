@@ -1,9 +1,7 @@
 defmodule Geo.QueryTest do
   use ExUnit.Case, async: true
 
-  alias Geo.Geometry.Point
-  alias Geo.Geometry.Zone
-  alias Geo.Geometry.SearchBox
+  alias Geo.Geometry.{Point, Zone, SearchBox}
   alias Geo.Query
 
   @bogota Point.new(4.598056, -74.075833, "Bogotá")
