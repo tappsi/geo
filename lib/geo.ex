@@ -27,9 +27,9 @@ defmodule Geo do
   ### Example
 
       iex> a = Geo.Geometry.Point.new(47.123, 120.567)
-      {:geometry, ...}
+      #Point<47.123, 120.567>
       iex> b = Geo.Geometry.Point.new(47.321, 120.765)
-      {:geometry, ...}
+      #Point<47.123, 120.567>
       iex> Geo.Query.distance(a, b)
       26644.001978045664
 
@@ -37,16 +37,17 @@ defmodule Geo do
   queries about the nearest one:
 
       iex> a = Geo.Geometry.Point.new(4.634562, -74.076297, "point a")
-      {:geometry, ...}
+      #Point<4.634562, -74.076297>
       iex> x = Geo.Geometry.Point.new(4.631415, -74.074769, "point x")
-      {:geometry, ...}
+      #Point<4.631415, -74.074769>
       iex> y = Geo.Geometry.Point.new(4.631420, -74.074770, "point y")
-      {:geometry, ...}
+      #Point<4.63142, -74.07477>
       iex> Geo.Geometry.Zone.new(2)
            |> Geo.Geometry.Zone.add_point(x)
            |> Geo.Geometry.Zone.add_point(y)
            |> Geo.Query.search_around(a, 389)
-      [{:geometry, ..., "point y"}]
+      [#Point<4.63142, -74.07477>]
+
 
   Check the corresponding module in order to learn about the current
   featureset.
