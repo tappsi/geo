@@ -60,7 +60,7 @@ defmodule Geo.QueryTest do
     point = Point.new(0, 0)
     box   = SearchBox.new(point, 10_000) # 10km
 
-    {:geometry, _, [{min_lat, max_lat}, {min_lng, max_lng}], _} = box
+    [{min_lat, max_lat}, {min_lng, max_lng}] = SearchBox.min_max(box)
 
     assert -0.13565538330708235 = min_lat
     assert 0.13565538330708235  = max_lat
@@ -72,7 +72,7 @@ defmodule Geo.QueryTest do
     point = Point.new(45, -120)
     box = SearchBox.new(point, 10_000) # 10km
 
-    {:geometry, _, [{min_lat, max_lat}, {min_lng, max_lng}], _} = box
+    [{min_lat, max_lat}, {min_lng, max_lng}] = SearchBox.min_max(box)
 
     assert_close 45.0 - 0.134974625, min_lat
     assert_close 45.0 + 0.134974625, max_lat
@@ -106,7 +106,5 @@ defmodule Geo.QueryTest do
 
   # Internal functions
 
-  defp assert_close(a, b) do
-    assert trunc(a * 10_000) == trunc(b * 10_000)
-  end
+  defp assert_close(a, b), do: assert trunc(a * 10_000) == trunc(b * 10_000)
 end

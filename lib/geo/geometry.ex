@@ -63,68 +63,7 @@ defimpl Inspect, for: Geo.Geometry.Point do
   alias Geo.Geometry.Point
 
   def inspect(point, _opts) do
-    "#Point<#{Point.latitude(point)}, #{Point.longitude(point)}>"
-  end
-end
-
-defmodule Geo.Geometry.Zone do
-  @moduledoc ~S"""
-  Zone wrapper
-  """
-
-  defstruct [:record]
-
-  @doc "Returns a new zone with the given `dimensions`"
-  def new(dimensions) when dimensions < 1 do
-    raise "invalid dimension"
-  end
-  def new(dimensions) do
-    %__MODULE__{record: :rstar.new(dimensions)}
-  end
-
-  @doc "Adds a `point` to the `zone`"
-  def add_point(%__MODULE__{record: zone}, point) do
-    %__MODULE__{record: :rstar.insert(zone, point.record)}
-  end
-
-  @doc "Deletes a `point` from the `zone`"
-  def delete_point(%__MODULE__{record: zone}, point) do
-    %__MODULE__{record: :rstar.delete(zone, point.record)}
-  end
-
-  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
-    %Geo.Geometry.Point{record: record}
-  end
-
-  @doc "Search within the `zone` for a given `search_box`"
-  def search_within(%__MODULE__{record: zone}, search_box) do
-    :rstar.search_within(zone, search_box)
-    |> Enum.map(&to_point(&1))
-  end
-
-  @doc """
-  Search the nearest `k` points contained inside the `zone` from
-  `search_point`
-
-    * `k` is the padding distance in meters
-  """
-  def search_nearest(%__MODULE__{record: zone}, search_point, k) when is_number(k) do
-    :rstar.search_nearest(zone, search_point.record, k)
-    |> Enum.map(&to_point(&1))
-  end
-
-  @doc """
-  Search the points contained or intersecting in the given
-  `search_point`
-  """
-  def search_around(zone, search_point, distance) when is_number(distance) do
-    :rstar.search_around(zone, search_point, distance)
-  end
-end
-
-defimpl Inspect, for: Geo.Geometry.Zone do
-  def inspect(zone, _opts) do
-    "#Zone<#{Kernel.elem(zone.record, 1)}>"
+    "#Point<[#{Point.latitude(point)}, #{Point.longitude(point)}]>"
   end
 end
 
@@ -134,9 +73,12 @@ defmodule Geo.Geometry.SearchBox do
 
   A search box is a bounded box padded according to a distance.
   """
+
   require Geo.Geometry.Point
   alias Geo.Geometry.Point
   alias Geo.Query
+
+  defstruct [:record]
 
   @padding 1.5
 
@@ -149,13 +91,13 @@ defmodule Geo.Geometry.SearchBox do
 
   ## Example
 
-      iex> point = Geo.Geometry.Point(4.0, -77.0)
-      {:geometry, ...}
+      iex> point = Geo.Geometry.Point.new(4.0, -77.0)
+      #Point<4.0, -77.0>
       iex> Geo.Geometry.SearchBox.new(point, 400)
-      {:geometry, ...}
+      #SearchBox<[3.994574049778225, 4.005425950221775], [-77.00540300083401, -76.99459699916599]>
 
   """
-  def new(%Geo.Geometry.Point{}=search_point, distance, value \\ :undefined) do
+  def new(%Point{}=search_point, distance, value \\ :undefined) do
     {lat, lng} = Point.latlon(search_point)
 
     # Pad the distance a bit so we over-query
@@ -181,26 +123,108 @@ defmodule Geo.Geometry.SearchBox do
 
     coords = [{min_lat, max_lat}, {min_lng, max_lng}]
 
-    Point.geometry(dimensions: 2, mbr: coords, value: value)
+    %__MODULE__{record: Point.geometry(dimensions: 2, mbr: coords, value: value)}
   end
 
   @doc "Returns the area of the given `search_box`"
-  def area(search_box) do
+  def area(%__MODULE__{record: search_box}) do
     :rstar_geometry.area(search_box)
   end
 
   @doc "Returns the margin of the given `search_box`"
-  def margin(search_box) do
+  def margin(%__MODULE__{record: search_box}) do
     :rstar_geometry.margin(search_box)
   end
 
   @doc "Returns the overlapping search box from `a` and `b`"
-  def intersect(a, b) do
+  def intersect(%__MODULE__{record: a}, %__MODULE__{record: b}) do
     :rstar_geometry.intersect(a, b)
   end
 
   @doc "Returns the center of the given `search_box`"
-  def center(search_box) do
-    :rstar_geometry.center(search_box)
+  def center(%__MODULE__{record: search_box}) do
+    :rstar_geometry.center(search_box) |> to_point()
+  end
+
+  @doc "Returns the min and max pair for latitude and longitude coordinates"
+  def min_max(%__MODULE__{record: search_box}) do
+    elem(search_box, 2)
+  end
+
+  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
+    %Point{record: record}
+  end
+end
+
+defimpl Inspect, for: Geo.Geometry.SearchBox do
+  def inspect(search_box, _opts) do
+    {_, _, [{lat_a, lat_b}, {lon_a, lon_b}], _} = search_box.record
+    "#SearchBox<[#{lat_a}, #{lat_b}], [#{lon_a}, #{lon_b}]>"
+  end
+end
+
+defmodule Geo.Geometry.Zone do
+  @moduledoc ~S"""
+  Zone wrapper
+  """
+
+  require Geo.Geometry.Point
+  alias Geo.Geometry.{SearchBox, Point}
+
+  defstruct [:record]
+
+  @doc "Returns a new zone with the given `dimensions`"
+  def new(dimensions) when dimensions < 1 do
+    raise "invalid dimension"
+  end
+  def new(dimensions) do
+    %__MODULE__{record: :rstar.new(dimensions)}
+  end
+
+  @doc "Adds a `point` to the `zone`"
+  def add_point(%__MODULE__{record: zone}, point) do
+    %__MODULE__{record: :rstar.insert(zone, point.record)}
+  end
+
+  @doc "Deletes a `point` from the `zone`"
+  def delete_point(%__MODULE__{record: zone}, point) do
+    %__MODULE__{record: :rstar.delete(zone, point.record)}
+  end
+
+  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
+    %Point{record: record}
+  end
+
+  @doc "Search within the `zone` for a given `search_box`"
+  def search_within(%__MODULE__{record: zone}, %SearchBox{record: search_box}) do
+    :rstar.search_within(zone, search_box)
+    |> Enum.map(&to_point(&1))
+  end
+
+  @doc """
+  Search the nearest `k` points contained inside the `zone` from
+  `search_point`
+
+    * `k` is the padding distance in meters
+  """
+  def search_nearest(%__MODULE__{record: zone}, %Point{record: search_point}, k)
+  when is_number(k) do
+    :rstar.search_nearest(zone, search_point, k)
+    |> Enum.map(&to_point(&1))
+  end
+
+  @doc """
+  Search the points contained or intersecting in the given
+  `search_point`
+  """
+  def search_around(%__MODULE__{record: zone}, %Point{record: search_point}, distance)
+  when is_number(distance) do
+    :rstar.search_around(zone, search_point, distance)
+  end
+end
+
+defimpl Inspect, for: Geo.Geometry.Zone do
+  def inspect(zone, _opts) do
+    "#Zone<[#{Kernel.elem(zone.record, 1)}]>"
   end
 end
