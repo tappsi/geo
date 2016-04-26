@@ -51,10 +51,18 @@ defmodule Geo do
   Check the corresponding module in order to learn about the current
   featureset.
   """
+
   use Application
 
   @doc "Start the `Geo` application"
   def start(_type, _args) do
-    Geo.Supervisor.start_link
+    import Supervisor.Spec, warn: false
+
+    children = [
+      supervisor(Geo.Region.Supervisor, [])
+    ]
+
+    opts = [strategy: :one_for_one, name: Geo.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
