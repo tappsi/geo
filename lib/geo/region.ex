@@ -65,7 +65,7 @@ defmodule Geo.Region do
 
   @doc "Shutdown the region identified by `id`"
   def shutdown(id) do
-    Supervisor.terminate_child(@region_sup, id)
-    Supervisor.delete_child(@region_sup, id)
+    :ok = Supervisor.terminate_child(@region_sup, id)
+    :ok = Supervisor.delete_child(@region_sup, id)
   end
 end
