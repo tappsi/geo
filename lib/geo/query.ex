@@ -37,7 +37,7 @@ defmodule Geo.Query do
 
   `distance` is in meters.
   """
-  def around(zone, point, distance) when distance > 0 do
+  def around(%Zone{}=zone, %Point{}=point, distance) when distance > 0 do
     search_box = SearchBox.new(point, distance)
 
     Zone.search_within(zone, search_box)
@@ -50,7 +50,7 @@ defmodule Geo.Query do
   We replace the `k` with `2 * k` and sort on true distance and select
   the first k.
   """
-  def nearest(zone, point, k) do
+  def nearest(%Zone{}=zone, %Point{}=point, k) do
     Zone.search_nearest(zone, point, 2 * k)
     |> Enum.map(&({distance(point, &1), &1}))
     |> Enum.sort_by(&near/1, &<=/2)

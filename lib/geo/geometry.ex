@@ -33,27 +33,37 @@ defmodule Geo.Geometry.Point do
   @moduledoc ~S"""
   2D point
   """
-  require Record
 
-  Record.defrecord :geometry, Record.extract(:geometry,
-                                             from_lib: "rstar/include/rstar.hrl")
+  require Record
+  defstruct [:record]
+
+  Record.defrecord :geometry,
+    Record.extract(:geometry, from_lib: "rstar/include/rstar.hrl")
 
   @doc """
   Returns new 2D point from `lat` and `lon`
   """
   def new(lat, lon, value \\ :undefined) when is_number(lat) and is_number(lon) do
-    :rstar_geometry.point2d(lat, lon, value)
+    %__MODULE__{record: :rstar_geometry.point2d(lat, lon, value)}
   end
 
   @doc "Returns the latitude for `arg`"
-  def latitude({:geometry, 2, [{lat, _}, {_, _}], _}), do: lat
+  def latitude(%__MODULE__{record: {:geometry, 2, [{lat, _}, {_, _}], _}}), do: lat
 
   @doc "Returns the longitude for `arg`"
-  def longitude({:geometry, 2, [{_, _}, {lng, _}], _}), do: lng
+  def longitude(%__MODULE__{record: {:geometry, 2, [{_, _}, {lng, _}], _}}), do: lng
 
   @doc "Returns the latitude and longitude for `arg`"
-  def latlon({:geometry, 2, [{lat, _}, {lng, _}], _}) do
+  def latlon(%__MODULE__{record: {:geometry, 2, [{lat, _}, {lng, _}], _}}) do
     {lat, lng}
+  end
+end
+
+defimpl Inspect, for: Geo.Geometry.Point do
+  alias Geo.Geometry.Point
+
+  def inspect(point, _opts) do
+    "#Point<#{Point.latitude(point)}, #{Point.longitude(point)}>"
   end
 end
 
@@ -62,27 +72,34 @@ defmodule Geo.Geometry.Zone do
   Zone wrapper
   """
 
+  defstruct [:record]
+
   @doc "Returns a new zone with the given `dimensions`"
   def new(dimensions) when dimensions < 1 do
     raise "invalid dimension"
   end
   def new(dimensions) do
-    :rstar.new(dimensions)
+    %__MODULE__{record: :rstar.new(dimensions)}
   end
 
   @doc "Adds a `point` to the `zone`"
-  def add_point(zone, point) do
-    :rstar.insert(zone, point)
+  def add_point(%__MODULE__{record: zone}, point) do
+    %__MODULE__{record: :rstar.insert(zone, point.record)}
   end
 
   @doc "Deletes a `point` from the `zone`"
-  def delete_point(zone, point) do
-    :rstar.delete(zone, point)
+  def delete_point(%__MODULE__{record: zone}, point) do
+    %__MODULE__{record: :rstar.delete(zone, point.record)}
+  end
+
+  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
+    %Geo.Geometry.Point{record: record}
   end
 
   @doc "Search within the `zone` for a given `search_box`"
-  def search_within(zone, search_box) do
+  def search_within(%__MODULE__{record: zone}, search_box) do
     :rstar.search_within(zone, search_box)
+    |> Enum.map(&to_point(&1))
   end
 
   @doc """
@@ -91,8 +108,9 @@ defmodule Geo.Geometry.Zone do
 
     * `k` is the padding distance in meters
   """
-  def search_nearest(zone, search_point, k) when is_number(k) do
-    :rstar.search_nearest(zone, search_point, k)
+  def search_nearest(%__MODULE__{record: zone}, search_point, k) when is_number(k) do
+    :rstar.search_nearest(zone, search_point.record, k)
+    |> Enum.map(&to_point(&1))
   end
 
   @doc """
@@ -101,6 +119,12 @@ defmodule Geo.Geometry.Zone do
   """
   def search_around(zone, search_point, distance) when is_number(distance) do
     :rstar.search_around(zone, search_point, distance)
+  end
+end
+
+defimpl Inspect, for: Geo.Geometry.Zone do
+  def inspect(zone, _opts) do
+    "#Zone<#{Kernel.elem(zone.record, 1)}>"
   end
 end
 
@@ -131,7 +155,7 @@ defmodule Geo.Geometry.SearchBox do
       {:geometry, ...}
 
   """
-  def new(search_point, distance, value \\ :undefined) do
+  def new(%Geo.Geometry.Point{}=search_point, distance, value \\ :undefined) do
     {lat, lng} = Point.latlon(search_point)
 
     # Pad the distance a bit so we over-query
