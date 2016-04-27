@@ -29,28 +29,4 @@ defmodule Geo.QueryTest do
     Query.around(zone, @booking_a, 1_000) # 1km
     |> Enum.each(&(assert &1 in [@point_a, @point_b]))
   end
-
-  test "latitudinal widths" do
-    # According to https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
-
-    assert 110574 = round(Query.latitudinal_width(0))
-    assert 110649 = round(Query.latitudinal_width(15))
-    assert 110852 = round(Query.latitudinal_width(30))
-    assert 111132 = round(Query.latitudinal_width(45))
-    assert 111412 = round(Query.latitudinal_width(60))
-    assert 111618 = round(Query.latitudinal_width(75))
-    assert 111694 = round(Query.latitudinal_width(90))
-  end
-
-  test "longitudinal widths" do
-    # According to https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
-
-    assert 111319 = round(Query.longitudinal_width(0))
-    assert 107550 = round(Query.longitudinal_width(15))
-    assert 96486  = round(Query.longitudinal_width(30))
-    assert 78847  = round(Query.longitudinal_width(45))
-    assert 55800  = round(Query.longitudinal_width(60))
-    assert 28902  = round(Query.longitudinal_width(75))
-    assert 0      = round(Query.longitudinal_width(90))
-  end
 end

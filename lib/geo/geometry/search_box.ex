@@ -7,9 +7,15 @@ defmodule Geo.Geometry.SearchBox do
 
   require Geo.Geometry.Point
   alias Geo.Geometry.Point
-  alias Geo.Query
+  alias :math, as: Math
 
   defstruct [:record]
+
+  @radius_meters 6378137.0              # Earth's radius in meters
+  @degrees_to_rad 0.017453292519943295  # Multiplier to convert from degrees to radians
+
+  @pi   Math.pi                         # Inlined at compile-time for speed
+  @e_sq 0.00669437999014                # e² inlined for speed
 
   @padding 1.5
 
@@ -35,7 +41,7 @@ defmodule Geo.Geometry.SearchBox do
     distance_pad = @padding * distance
 
     # Get the lat/lng binding box and compute the width
-    lat_spread = distance_pad / Query.latitudinal_width(lat)
+    lat_spread = distance_pad / latitudinal_width(lat)
     min_lat = lat - lat_spread
     max_lat = lat + lat_spread
 
@@ -48,7 +54,7 @@ defmodule Geo.Geometry.SearchBox do
         lat < 0  -> min_lat
       end
 
-    lng_spread = distance_pad / Query.longitudinal_width(widest_lat)
+    lng_spread = distance_pad / longitudinal_width(widest_lat)
     min_lng = lng - lng_spread
     max_lng = lng + lng_spread
 
@@ -80,6 +86,37 @@ defmodule Geo.Geometry.SearchBox do
   @doc "Returns the min and max pair for latitude and longitude coordinates"
   def min_max(%__MODULE__{record: search_box}) do
     elem(search_box, 2)
+  end
+
+  @doc """
+  Returns the width of a latitudinal degree in meters for the given
+  `lat`
+
+  See [Length of a degree of
+  latitude](https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude)
+  """
+  def latitudinal_width(lat) when is_number(lat) do
+    lat_rad = lat * @degrees_to_rad
+
+    # According to Meridian arc
+    111132.954 - 559.822 * Math.cos(2.0 * lat_rad) + 1.175 * Math.cos(4.0 * lat_rad)
+  end
+
+  @doc """
+  Returns the width of a longitudinal degree in meters for the given
+  `lat`
+
+  Earth is modelled as an ellipsoid. We use a
+  [WGS84](https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84)
+  ellipsoid with `a = #{@radius_meters}` and have e² as extra
+  parameter.
+  """
+  def longitudinal_width(lat) when is_number(lat) do
+    lat_rad     = lat * @degrees_to_rad
+    numerator   = @pi * @radius_meters * Math.cos(lat_rad)
+    denominator = 180 * Math.sqrt(1 - @e_sq * Math.pow(Math.sin(lat_rad), 2))
+
+    numerator / denominator
   end
 end
 

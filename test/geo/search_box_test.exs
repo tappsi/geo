@@ -40,6 +40,30 @@ defmodule Geo.SeachBoxTest do
     assert_close -120.0 + 0.19069, max_lng
   end
 
+  test "latitudinal widths" do
+    # According to https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
+
+    assert 110574 = round(SearchBox.latitudinal_width(0))
+    assert 110649 = round(SearchBox.latitudinal_width(15))
+    assert 110852 = round(SearchBox.latitudinal_width(30))
+    assert 111132 = round(SearchBox.latitudinal_width(45))
+    assert 111412 = round(SearchBox.latitudinal_width(60))
+    assert 111618 = round(SearchBox.latitudinal_width(75))
+    assert 111694 = round(SearchBox.latitudinal_width(90))
+  end
+
+  test "longitudinal widths" do
+    # According to https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
+
+    assert 111319 = round(SearchBox.longitudinal_width(0))
+    assert 107550 = round(SearchBox.longitudinal_width(15))
+    assert 96486  = round(SearchBox.longitudinal_width(30))
+    assert 78847  = round(SearchBox.longitudinal_width(45))
+    assert 55800  = round(SearchBox.longitudinal_width(60))
+    assert 28902  = round(SearchBox.longitudinal_width(75))
+    assert 0      = round(SearchBox.longitudinal_width(90))
+  end
+
   # Internal functions
 
   defp assert_close(a, b), do: assert trunc(a * 10_000) == trunc(b * 10_000)
