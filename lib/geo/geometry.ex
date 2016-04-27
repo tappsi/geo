@@ -14,7 +14,11 @@ defmodule Geo.Geometry do
 
   Our basic representation of a location is a `Geo.Geometry.Point`.
 
-  ## Zones
+  ## SearchBox
+
+  A padded bounded box that expands given an initial `Geo.Geometry.Point`.
+
+  ## Zone
 
   A `Geo.Geometry.Zone` is a placeholder for storing multiple
   `Geo.Geometry.Point` and perform distance queries against it.

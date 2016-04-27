@@ -14,6 +14,9 @@ defmodule Geo do
     * `Geo.Geometry` - Provides different abstractions for wrapping
       geolocation points. It allows creation and querying on 2D shapes
 
+    * `Geo.Distance` - Provides different distance measurement
+      functions for public use.
+
     * `Geo.Region` - Provides the facilities for creating regions of
       multiple `Geo.Geometry.Zone` and a basic API for storing,
       forgetting and querying different `Geo.Geometry.Point` on such

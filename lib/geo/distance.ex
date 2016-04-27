@@ -26,8 +26,8 @@ defmodule Geo.Distance do
 
   ## Caveats
 
-  Euclidean distance is pretty good for relative small areas given
-  Earth's ellipticity. It works on ℝ².
+  Euclidean distance is pretty good for relative small areas but
+  overall it's not accurate given Earth's ellipticity. It works on ℝ².
   """
   def euclidean(%Point{}=a, %Point{}=b) do
     {a_lat, a_lon} = Point.latlon(a)
@@ -67,6 +67,12 @@ defmodule Geo.Distance do
   need to take into consideration the implementation of more accurate
   methods for dealing with Earth's ellipticity, spherical sharding and
   indexing.
+
+  ## More information
+
+  - [Calculate distance, bearing and more between Latitude/Longitude
+    points](http://www.movable-type.co.uk/scripts/latlong.html)
+
   """
   def harvesine(%Point{}=a, %Point{}=b) do
     {lat_a, lng_a} = Point.latlon(a)
