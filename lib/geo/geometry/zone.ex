@@ -3,6 +3,19 @@ defmodule Geo.Geometry.Zone do
   Zone wrapper
   """
 
+  defmodule InvalidDimension do
+    @moduledoc """
+    Raised when the specified dimension is higher than 1.
+    """
+
+    defexception [:message]
+
+    def exception([dimensions: d]) do
+      msg = "#{inspect d} is not a valid number of dimensions"
+      %InvalidDimension{message: msg}
+    end
+  end
+
   require Geo.Geometry.Point
   alias Geo.Geometry.{SearchBox, Point}
 
@@ -10,7 +23,7 @@ defmodule Geo.Geometry.Zone do
 
   @doc "Returns a new zone with the given `dimensions`"
   def new(dimensions) when dimensions < 1 do
-    raise "invalid dimension"
+    raise InvalidDimension, dimensions: dimensions
   end
   def new(dimensions) do
     %__MODULE__{record: :rstar.new(dimensions)}
