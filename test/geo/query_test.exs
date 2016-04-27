@@ -1,7 +1,7 @@
 defmodule Geo.QueryTest do
   use ExUnit.Case, async: true
 
-  alias Geo.Geometry.{Point, Zone, SearchBox}
+  alias Geo.Geometry.{Point, Zone}
   alias Geo.Query
 
   @bogota Point.new(4.598056, -74.075833, "Bogotá")
@@ -44,42 +44,6 @@ defmodule Geo.QueryTest do
     |> Enum.each(&(assert &1 in [@point_a, @point_b]))
   end
 
-  test "search near the zone" do
-    zone =
-      Zone.new(2)
-      |> Zone.add_point(@point_a)
-      |> Zone.add_point(@point_b)
-      |> Zone.add_point(@point_c)
-
-    distance = Query.distance(@point_a, @booking_a)
-
-    assert [{^distance, @point_a}| _] = Query.nearest(zone, @booking_a, 10)
-  end
-
-  test "search box equator" do
-    point = Point.new(0, 0)
-    box   = SearchBox.new(point, 10_000) # 10km
-
-    [{min_lat, max_lat}, {min_lng, max_lng}] = SearchBox.min_max(box)
-
-    assert -0.13565538330708235 = min_lat
-    assert 0.13565538330708235  = max_lat
-    assert -0.1347476677660395  = min_lng
-    assert 0.1347476677660395   = max_lng
-  end
-
-  test "search box offset" do
-    point = Point.new(45, -120)
-    box = SearchBox.new(point, 10_000) # 10km
-
-    [{min_lat, max_lat}, {min_lng, max_lng}] = SearchBox.min_max(box)
-
-    assert_close 45.0 - 0.134974625, min_lat
-    assert_close 45.0 + 0.134974625, max_lat
-    assert_close -120.0 - 0.19069, min_lng
-    assert_close -120.0 + 0.19069, max_lng
-  end
-
   test "latitudinal widths" do
     # According to https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
 
@@ -103,8 +67,4 @@ defmodule Geo.QueryTest do
     assert 28902  = round(Query.longitudinal_width(75))
     assert 0      = round(Query.longitudinal_width(90))
   end
-
-  # Internal functions
-
-  defp assert_close(a, b), do: assert trunc(a * 10_000) == trunc(b * 10_000)
 end
