@@ -74,16 +74,12 @@ defmodule Geo.Geometry.SearchBox do
 
   @doc "Returns the center of the given `search_box`"
   def center(%__MODULE__{record: search_box}) do
-    :rstar_geometry.center(search_box) |> to_point()
+    :rstar_geometry.center(search_box) |> Point.to_point()
   end
 
   @doc "Returns the min and max pair for latitude and longitude coordinates"
   def min_max(%__MODULE__{record: search_box}) do
     elem(search_box, 2)
-  end
-
-  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
-    %Point{record: record}
   end
 end
 

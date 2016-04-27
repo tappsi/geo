@@ -26,6 +26,11 @@ defmodule Geo.Geometry.Point do
   def latlon(%__MODULE__{record: {:geometry, 2, [{lat, _}, {lng, _}], _}}) do
     {lat, lng}
   end
+
+  @doc "Wraps the `:geometry` record into a `%Point{}`"
+  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
+    %__MODULE__{record: record}
+  end
 end
 
 defimpl Inspect, for: Geo.Geometry.Point do

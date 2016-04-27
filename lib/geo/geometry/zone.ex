@@ -26,14 +26,10 @@ defmodule Geo.Geometry.Zone do
     %__MODULE__{record: :rstar.delete(zone, point.record)}
   end
 
-  def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
-    %Point{record: record}
-  end
-
   @doc "Search within the `zone` for a given `search_box`"
   def search_within(%__MODULE__{record: zone}, %SearchBox{record: search_box}) do
     :rstar.search_within(zone, search_box)
-    |> Enum.map(&to_point(&1))
+    |> Enum.map(&Point.to_point(&1))
   end
 
   @doc """
@@ -45,7 +41,7 @@ defmodule Geo.Geometry.Zone do
   def search_nearest(%__MODULE__{record: zone}, %Point{record: search_point}, k)
   when is_number(k) do
     :rstar.search_nearest(zone, search_point, k)
-    |> Enum.map(&to_point(&1))
+    |> Enum.map(&Point.to_point(&1))
   end
 
   @doc """
