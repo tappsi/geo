@@ -64,6 +64,7 @@ defmodule Geo.Geometry.Zone do
   def search_around(%__MODULE__{record: zone}, %Point{record: search_point}, distance)
   when is_number(distance) do
     :rstar.search_around(zone, search_point, distance)
+    |> Enum.map(&Point.to_point(&1))
   end
 end
 
