@@ -29,11 +29,10 @@ defmodule Geo.Query do
   @e_sq 0.00669437999014                # e² inlined for speed
 
   @doc """
-  Search around the `zone` for a given `point` using `distance` as
-  padding
+  Search around the `zone` for a given `point`
 
-  We replace this query with a search rectangle that adjusts for
-  narrowing longitude.
+  A new `SearchBox` is created for adjusting the latitude using the
+  `distance` as padding.
 
   `distance` is in meters.
   """
