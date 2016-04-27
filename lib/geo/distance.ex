@@ -29,7 +29,7 @@ defmodule Geo.Distance do
   Euclidean distance is pretty good for relative small areas but
   overall it's not accurate given Earth's ellipticity. It works on ℝ².
   """
-  @spec euclidean(Point.t, Point.t) :: non_neg_integer
+  @spec euclidean(Point.t, Point.t) :: float
   def euclidean(%Point{}=a, %Point{}=b) do
     {a_lat, a_lon} = Point.latlon(a)
     {b_lat, b_lon} = Point.latlon(b)
@@ -45,7 +45,7 @@ defmodule Geo.Distance do
 
   It is defined as `dist1((x1, y1),(x2, y2)) = |x2 - x1| + |y2 - y1|`
   """
-  @spec manhattan(Point.t, Point.t) :: non_neg_integer
+  @spec manhattan(Point.t, Point.t) :: float
   def manhattan(%Point{}=a, %Point{}=b) do
     {a_lat, a_lon} = Point.latlon(a)
     {b_lat, b_lon} = Point.latlon(b)

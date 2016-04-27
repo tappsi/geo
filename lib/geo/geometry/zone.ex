@@ -71,7 +71,7 @@ defmodule Geo.Geometry.Zone do
   Search the points contained or intersecting in the given
   `search_point`
   """
-  @spec search_around(Zone.t, Point.t, non_neg_integer) :: [Point.t]
+  @spec search_around(Zone.t, Point.t, float) :: [Point.t]
   def search_around(%__MODULE__{record: zone}, %Point{record: search_point}, distance)
   when is_number(distance) do
     :rstar.search_around(zone, search_point, distance)
