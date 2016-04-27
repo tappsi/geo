@@ -19,6 +19,12 @@ defmodule Geo.Geometry.Point do
   require Record
   defstruct [:record]
 
+  @type latitude  :: float
+  @type longitude :: float
+  @type geometry  :: {atom(), non_neg_integer, list(), term()}
+
+  @type t :: %__MODULE__{record: geometry}
+
   Record.defrecord :geometry,
     Record.extract(:geometry, from_lib: "rstar/include/rstar.hrl")
 
@@ -28,6 +34,7 @@ defmodule Geo.Geometry.Point do
   It raises a `InvalidCoordinates` exception if `lat` and `lon` are
   not numbers.
   """
+  @spec new(latitude, longitude, any()) :: Point.t
   def new(lat, lon, value \\ :undefined)
 
   def new(lat, lon, value) when is_number(lat) and is_number(lon) do
@@ -36,17 +43,21 @@ defmodule Geo.Geometry.Point do
   def new(lat, lon, _value), do: raise InvalidCoordinates, lat: lat, lon: lon
 
   @doc "Returns the latitude for `arg`"
+  @spec latitude(Point.t) :: latitude
   def latitude(%__MODULE__{record: {:geometry, 2, [{lat, _}, {_, _}], _}}), do: lat
 
   @doc "Returns the longitude for `arg`"
+  @spec longitude(Point.t) :: longitude
   def longitude(%__MODULE__{record: {:geometry, 2, [{_, _}, {lng, _}], _}}), do: lng
 
   @doc "Returns the latitude and longitude for `arg`"
+  @spec latlon(Point.t) :: {latitude, longitude}
   def latlon(%__MODULE__{record: {:geometry, 2, [{lat, _}, {lng, _}], _}}) do
     {lat, lng}
   end
 
   @doc "Wraps the `:geometry` record into a `%Point{}`"
+  @spec to_point(geometry) :: Point.t
   def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
     %__MODULE__{record: record}
   end

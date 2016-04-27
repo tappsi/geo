@@ -11,6 +11,13 @@ defmodule Geo.Geometry.SearchBox do
 
   defstruct [:record]
 
+  @type geometry   :: {atom(), non_neg_integer, list(), term()}
+  @type boundaries :: maybe_improper_list(tuple(), tuple())
+  @type latitude   :: float
+  @type longitude  :: float
+
+  @type t :: %__MODULE__{record: geometry}
+
   @radius_meters 6378137.0              # Earth's radius in meters
   @degrees_to_rad 0.017453292519943295  # Multiplier to convert from degrees to radians
 
@@ -34,6 +41,7 @@ defmodule Geo.Geometry.SearchBox do
       #SearchBox<[3.994574049778225, 4.005425950221775], [-77.00540300083401, -76.99459699916599]>
 
   """
+  @spec new(Point.t, non_neg_integer, any) :: SearchBox.t
   def new(%Point{}=search_point, distance, value \\ :undefined) do
     {lat, lng} = Point.latlon(search_point)
 
@@ -64,11 +72,13 @@ defmodule Geo.Geometry.SearchBox do
   end
 
   @doc "Returns the area of the given `search_box`"
+  @spec area(SearchBox.t) :: float
   def area(%__MODULE__{record: search_box}) do
     :rstar_geometry.area(search_box)
   end
 
   @doc "Returns the margin of the given `search_box`"
+  @spec margin(SearchBox.t) :: float
   def margin(%__MODULE__{record: search_box}) do
     :rstar_geometry.margin(search_box)
   end
@@ -79,11 +89,13 @@ defmodule Geo.Geometry.SearchBox do
   end
 
   @doc "Returns the center of the given `search_box`"
+  @spec center(SearchBox.t) :: Point.t
   def center(%__MODULE__{record: search_box}) do
     :rstar_geometry.center(search_box) |> Point.to_point()
   end
 
   @doc "Returns the min and max pair for latitude and longitude coordinates"
+  @spec min_max(SearchBox.t) :: boundaries
   def min_max(%__MODULE__{record: search_box}) do
     elem(search_box, 2)
   end
@@ -95,6 +107,7 @@ defmodule Geo.Geometry.SearchBox do
   See [Length of a degree of
   latitude](https://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude)
   """
+  @spec latitudinal_width(latitude) :: float
   def latitudinal_width(lat) when is_number(lat) do
     lat_rad = lat * @degrees_to_rad
 
@@ -111,6 +124,7 @@ defmodule Geo.Geometry.SearchBox do
   ellipsoid with `a = #{@radius_meters}` and have e² as extra
   parameter.
   """
+  @spec longitudinal_width(longitude) :: float
   def longitudinal_width(lat) when is_number(lat) do
     lat_rad     = lat * @degrees_to_rad
     numerator   = @pi * @radius_meters * Math.cos(lat_rad)
