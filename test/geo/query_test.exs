@@ -13,20 +13,6 @@ defmodule Geo.QueryTest do
   @booking_a Point.new(4.634999, -74.071882, "booking a")
   @booking_b Point.new(4.626682, -74.071308, "booking b")
 
-  test "distance" do
-    a = Point.new(47.123, 120.567)
-    b = Point.new(45.876, 123.876)
-
-    assert 289038078 == trunc(1_000 * Query.distance(a, b))
-  end
-
-  test "nearby distance" do
-    a = Point.new(47.123, 120.567)
-    b = Point.new(47.276, 120.576)
-
-    assert 17045.480008358903 == Query.distance(a, b)
-  end
-
   test "search around the zone" do
     zone =
       Zone.new(2)

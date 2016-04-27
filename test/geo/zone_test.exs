@@ -1,7 +1,7 @@
 defmodule Geo.ZoneTest do
   use ExUnit.Case, async: true
 
-  alias Geo.Query
+  alias Geo.{Query, Distance}
   alias Geo.Geometry.{Zone, SearchBox, Point}
 
   @booking_a Point.new(4.634999, -74.071882, "booking a")
@@ -35,7 +35,7 @@ defmodule Geo.ZoneTest do
       |> Zone.add_point(@point_b)
       |> Zone.add_point(@point_c)
 
-    distance = Query.distance(@point_a, @booking_a)
+    distance = Distance.harvesine(@point_a, @booking_a)
 
     assert [{^distance, @point_a}| _] = Query.nearest(zone, @booking_a, 10)
   end

@@ -20,6 +20,7 @@ defmodule Geo.Query do
   """
 
   alias Geo.Geometry.{Point, Zone, SearchBox}
+  alias Geo.Distance
   alias :math, as: Math
 
   @radius_meters 6378137.0              # Earth's radius in meters
@@ -40,7 +41,7 @@ defmodule Geo.Query do
     search_box = SearchBox.new(point, distance)
 
     Zone.search_within(zone, search_box)
-    |> Enum.filter(&(distance(point, &1) <= distance))
+    |> Enum.filter(&(Distance.harvesine(point, &1) <= distance))
   end
 
   @doc """
@@ -49,46 +50,11 @@ defmodule Geo.Query do
   We replace the `k` with `2 * k` and sort on true distance and select
   the first k.
   """
-  def nearest(%Zone{}=zone, %Point{}=point, k) do
+  def nearest(%Zone{}=zone, %Point{}=point, k) when k > 0 do
     Zone.search_nearest(zone, point, 2 * k)
-    |> Enum.map(&({distance(point, &1), &1}))
+    |> Enum.map(&({Distance.harvesine(point, &1), &1}))
     |> Enum.sort_by(&near/1, &<=/2)
     |> Enum.take(k)
-  end
-
-  @doc """
-  Estimates the distance in meters between two `Geo.Geometry.Point` `a` and `b`
-  using the [Law of Harvestines](http://en.wikipedia.org/wiki/Law_of_haversines)
-
-  Provides a better estimate of distance than the Euclidean distance
-  for the R-Tree.
-
-  The result is in meters.
-
-  ## Alternatives
-
-  There are different approaches for measuring distances over
-  spherical distances. We use Harvestines as our first approach but we
-  need to take into consideration the implementation of more accurate
-  methods for dealing with Earth's ellipticity, spherical sharding and
-  indexing.
-  """
-  def distance(a, b) do
-    {lat_a, lng_a} = Point.latlon(a)
-    {lat_b, lng_b} = Point.latlon(b)
-
-    lat_arc = (lat_a - lat_b) * @degrees_to_rad
-    lng_arc = (lng_a - lng_b) * @degrees_to_rad
-
-    # Correct to 0.01 mt
-    latitude_h  = Math.sin(lat_arc * 0.5) |> Math.pow(2) # φ = 0.5 degrees
-    longitude_h = Math.sin(lng_arc * 0.5) |> Math.pow(2) # φ = 0.5 degrees
-
-    t1 = Math.cos(lat_a * @degrees_to_rad) * Math.cos(lat_b * @degrees_to_rad)
-    t2 = latitude_h + t1 * longitude_h
-
-    distance_angle = 2.0 * Math.asin(Math.sqrt(t2))
-    distance_angle * @radius_meters
   end
 
   @doc """
