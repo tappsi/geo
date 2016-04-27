@@ -5,7 +5,7 @@ defmodule Geo.Geometry.Zone do
 
   defmodule InvalidDimension do
     @moduledoc """
-    Raised when the specified dimension is higher than 1.
+    Raised when the specified dimension is less than 1.
     """
 
     defexception [:message]
