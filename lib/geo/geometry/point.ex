@@ -70,7 +70,7 @@ defmodule Geo.Geometry.Point do
   end
 
   @doc "Returns the value for `arg`"
-  @spec set_value(geometry, value) :: term()
+  @spec value(geometry) :: term()
   def value(%__MODULE__{record: {:geometry, _, [{_, _}, {_, _}], value}}), do: value
 end
 
