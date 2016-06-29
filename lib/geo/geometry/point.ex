@@ -21,6 +21,7 @@ defmodule Geo.Geometry.Point do
 
   @type latitude  :: float
   @type longitude :: float
+  @type value     :: term()
   @type geometry  :: {atom(), non_neg_integer, list(), term()}
 
   @type t :: %__MODULE__{record: geometry}
@@ -61,6 +62,16 @@ defmodule Geo.Geometry.Point do
   def to_point({:geometry, _, [{_, _}, {_, _}], _}=record) do
     %__MODULE__{record: record}
   end
+
+  @doc "Define or replace `:value` field for given `%Point{}`"
+  @spec set_value(geometry, value) :: Point.t
+  def set_value(%__MODULE__{record: {:geometry, 2, coords, _}}, value) do
+    %__MODULE__{record: {:geometry, 2, coords, value}}
+  end
+
+  @doc "Returns the value for `arg`"
+  @spec value(geometry) :: term()
+  def value(%__MODULE__{record: {:geometry, _, [{_, _}, {_, _}], value}}), do: value
 end
 
 defimpl Inspect, for: Geo.Geometry.Point do
