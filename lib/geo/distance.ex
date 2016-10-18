@@ -34,10 +34,10 @@ defmodule Geo.Distance do
     {a_lat, a_lon} = Point.latlon(a)
     {b_lat, b_lon} = Point.latlon(b)
 
-    a_diff = a_lat - a_lon
-    b_diff = b_lat - b_lon
+    lat_diff = a_lat - b_lat
+    lon_diff = a_lon - b_lon
 
-    Math.sqrt(Math.pow(a_diff, 2) + Math.pow(b_diff, 2))
+    Math.sqrt(lat_diff * lat_diff + lon_diff * lon_diff)
   end
 
   @doc """
