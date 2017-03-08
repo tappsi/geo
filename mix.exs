@@ -9,17 +9,17 @@ defmodule Geo.Mixfile do
      source_url: "https://github.com/tappsi/geo",
      homepage_url: "https://github.com/tappsi/geo",
      version: @version,
-     description: description,
-     docs: docs,
-     elixir: "~> 1.2",
+     description: description(),
+     docs: docs(),
+     elixir: "~> 1.4",
      test_coverage: [tool: ExCoveralls],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   def application do
-    [applications: [:logger, :rstar],
+    [extra_applications: [:logger],
      mod: {Geo, []}]
   end
 
