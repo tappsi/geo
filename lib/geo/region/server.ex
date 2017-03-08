@@ -6,7 +6,6 @@ defmodule Geo.Region.Server do
   alias Geo.Query
   alias Geo.Geometry.{Point, Zone, SearchBox}
 
-  @transfer_timeout 60_000 # 60sec
   @default_radius   10_000 # 10km
 
   # GenServer callbacks

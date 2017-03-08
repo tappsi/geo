@@ -4,8 +4,6 @@ defmodule Geo.QueryTest do
   alias Geo.Geometry.{Point, Zone}
   alias Geo.Query
 
-  @bogota Point.new(4.598056, -74.075833, "Bogotá")
-
   @point_a Point.new(4.634562, -74.076297, "driver a")
   @point_b Point.new(4.631415, -74.074769, "driver b")
   @point_c Point.new(5.631415, -72.074769, "driver c")

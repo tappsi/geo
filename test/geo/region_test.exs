@@ -4,8 +4,6 @@ defmodule Geo.RegionTest do
   alias Geo.Region
   alias Geo.Geometry.Point
 
-  @bogota    Point.new(4.598056, -74.075833, "Bogotá")
-
   @booking_a Point.new(4.634999, -74.071882, "booking a")
   @point_a   Point.new(4.634562, -74.076297, "driver a")
 
