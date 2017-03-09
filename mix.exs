@@ -1,7 +1,7 @@
 defmodule Geo.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version File.read!("VERSION") |> String.strip
 
   def project do
     [app: :geo,
