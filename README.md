@@ -34,4 +34,8 @@ For general guides on contributing to the project please see
 
 ## License
 
-Copyright (c) 2015 Tappsi S.A.S
+Copyright (c) 2015-2017 Tappsi S.A.S
+
+This work is free. You can redistribute it and/or modify it under the
+terms of the MIT License. See the [LICENSE](LICENSE) file for more
+details.
