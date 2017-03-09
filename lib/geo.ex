@@ -1,7 +1,5 @@
 defmodule Geo do
   @moduledoc ~S"""
-  `Geo` service
-
   `Geo` is a library for issuing queries and interacting with
   distances, shapes and locations on the Earth's surface in a 2D
   plane.
@@ -9,7 +7,8 @@ defmodule Geo do
   It currently offers with the following modules:
 
     * `Geo.Query` - Provides the proximity engine and helpers for
-      working with Euclidan distances on Earth's surface in a 2D plane
+      working with Euclidean distances on Earth's surface in a 2D
+      plane
 
     * `Geo.Geometry` - Provides different abstractions for wrapping
       geolocation points. It allows creation and querying on 2D shapes

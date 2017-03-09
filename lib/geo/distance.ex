@@ -30,7 +30,7 @@ defmodule Geo.Distance do
   overall it's not accurate given Earth's ellipticity. It works on ℝ².
   """
   @spec euclidean(Point.t, Point.t) :: float
-  def euclidean(%Point{}=a, %Point{}=b) do
+  def euclidean(%Point{} = a, %Point{} = b) do
     {a_lat, a_lon} = Point.latlon(a)
     {b_lat, b_lon} = Point.latlon(b)
 
@@ -46,7 +46,7 @@ defmodule Geo.Distance do
   It is defined as `dist1((x1, y1),(x2, y2)) = |x2 - x1| + |y2 - y1|`
   """
   @spec manhattan(Point.t, Point.t) :: float
-  def manhattan(%Point{}=a, %Point{}=b) do
+  def manhattan(%Point{} = a, %Point{} = b) do
     {a_lat, a_lon} = Point.latlon(a)
     {b_lat, b_lon} = Point.latlon(b)
 
@@ -57,15 +57,15 @@ defmodule Geo.Distance do
   Estimates the distance in meters between point `a` and `b` using the
   [Law of Harvestines](http://en.wikipedia.org/wiki/Law_of_haversines)
 
-  Provides a better estimate of distance than the Euclidean distance
-  for the R-Tree.
+  Provides a better estimate than the Euclidean distance for the
+  R-Tree.
 
   The result is in meters.
 
   ## Alternatives
 
   There are different approaches for measuring distances over
-  spherical distances. We use Harvestines as our first approach but we
+  spherical distances. We use harvesines as our first approach but we
   need to take into consideration the implementation of more accurate
   methods for dealing with Earth's ellipticity, spherical sharding and
   indexing.
@@ -77,7 +77,7 @@ defmodule Geo.Distance do
 
   """
   @spec harvesine(Point.t, Point.t) :: float
-  def harvesine(%Point{}=a, %Point{}=b) do
+  def harvesine(%Point{} = a, %Point{} = b) do
     {lat_a, lng_a} = Point.latlon(a)
     {lat_b, lng_b} = Point.latlon(b)
 
