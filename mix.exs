@@ -21,7 +21,7 @@ defmodule Geo.Mixfile do
 
   def application do
     [extra_applications: [:logger],
-     mod: {Geo, []}]
+     mod: {Geo.Application, []}]
   end
 
   defp description do
