@@ -3,20 +3,18 @@ defmodule Geo.Region.Supervisor do
 
   use Supervisor
 
+  @name __MODULE__
+
   # API
 
-  def worker(region_args, region_id) do
-    worker(Geo.Region.Server, region_args, id: region_id)
+  def start_link do
+    Supervisor.start_link(__MODULE__, [], name: @name)
   end
 
   # Supervisor callbacks
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
-  end
-
   def init(_args) do
-    opts = [strategy: :one_for_one]
-    supervise([], opts)
+    child = worker(Geo.Region, [], restart: :transient)
+    supervise([child], [strategy: :simple_one_for_one])
   end
 end

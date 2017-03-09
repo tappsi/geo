@@ -17,9 +17,27 @@ defmodule Geo.Region do
       iex> {:ok, points} = Geo.Region.query_around(region, point_c, 500)
       {:ok, [...]}
   """
+
+  use GenServer
+
+  alias Geo.Query
+  alias Geo.Geometry.{Point, Zone, SearchBox}
+
+  @default_radius   10_000 # 10km
+
   @region_sup Geo.Region.Supervisor
 
   # API
+
+  @doc "Create a new region"
+  def new(name, lat, lon) do
+    Supervisor.start_child(@region_sup, [name, lat, lon])
+  end
+
+  @doc "Shutdown the `region`"
+  def shutdown(region) do
+    Supervisor.terminate_child(@region_sup, region)
+  end
 
   @doc "List all registered objects in `region`"
   def list_objects(region) do
@@ -49,23 +67,71 @@ defmodule Geo.Region do
   @doc "Return all the available regions"
   def all do
     Supervisor.which_children(@region_sup)
-    |> Enum.map(fn {name, pid, _, _} ->
-      {name, pid}
-    end)
+    |> Enum.map(fn {name, pid, _, _} -> {name, pid} end)
   end
 
-  @doc "Create a new region"
-  def new(name, lat, lon) do
-    region_id    = :crypto.hash(:md5, name) |> Base.encode64
-    region_args  = [region_id, name, lat, lon]
-    region_specs = @region_sup.worker(region_args, region_id)
-
-    Supervisor.start_child(@region_sup, region_specs)
+  def start_link(name, lat, lon) do
+    GenServer.start_link(__MODULE__, [name, lat, lon])
   end
 
-  @doc "Shutdown the region identified by `id`"
-  def shutdown(id) do
-    :ok = Supervisor.terminate_child(@region_sup, id)
-    :ok = Supervisor.delete_child(@region_sup, id)
+  # GenServer callbacks
+
+  def init([name, lat, lon]) do
+    table_opts =
+      [:set,
+       read_concurrency: true,
+       write_concurrency: true]
+
+    object_table = :ets.new(:"#{name}_objects", table_opts)
+    geo_table = :ets.new(:"#{name}_geometries", table_opts)
+
+    coverage = Point.new(lat, lon) |> SearchBox.new(@default_radius)
+    zone = Zone.new(2)
+
+    state =
+      %{name: name, objects: object_table,
+        geometries: geo_table, zone: zone,
+        coverage: coverage}
+
+    {:ok, state}
   end
+
+  def handle_call(:list_objects, _from, state) do
+    keys = :ets.foldl(&append_keys/2, [], state.objects)
+    {:reply, {:ok, keys}, state}
+  end
+  def handle_call({:add_object, id, location}, _from, state) do
+    object = %{id: id, location: location}
+    {resp, new_state} =
+      case :ets.insert_new(state.objects, {id, object}) do
+        true ->
+          {:ok, %{state| zone: Zone.add_point(state.zone, location)}}
+        false ->
+          {:already_added, state}
+      end
+    {:reply, resp, new_state}
+  end
+  def handle_call({:remove_object, id}, _from, state) do
+    {resp, new_state} =
+      case :ets.lookup(state.objects, id) do
+        [] ->
+          {:not_found, state}
+        [{^id, obj}] ->
+          :ets.delete(state.objects, id)
+          {:ok, %{state| zone: Zone.delete_point(state.zone, obj.location)}}
+      end
+    {:reply, resp, new_state}
+  end
+  def handle_call({:query_around, search_point, distance}, _from, state) do
+    location = Query.around(state.zone, search_point, distance)
+    {:reply, {:ok, location}, state}
+  end
+  def handle_call({:query_nearest, search_point, limit}, _from, state) do
+    location = Query.nearest(state.zone, search_point, limit)
+    {:reply, {:ok, location}, state}
+  end
+
+  # Internal functions
+
+  defp append_keys({key, _val}, acc), do: [key | acc]
 end
